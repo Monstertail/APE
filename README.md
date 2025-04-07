@@ -29,7 +29,9 @@ Follow the instruction [here](lmcache/benchmarks/rag/README.md). We adopt "meta-
 
 Start a vLLM server:
 ```bash
-vllm serve meta-llama/Llama-3.1-8B-Instruct --disable-log-requests
+# Rope is not supported(No blend for Llama-3.1-8B-Instruction)
+# vllm serve meta-llama/Llama-3.1-8B-Instruct --disable-log-requests
+vllm serve mistralai/Mistral-7B-Instruct-v0.2 --disable-log-requests
 ```
 
 Bench vLLM
@@ -40,7 +42,9 @@ bash launch_vllm.sh
 
 Start lm-cache-vLLM server:
 ```bash
-LMCACHE_CONFIG_FILE=example_blending.yaml python3 -m lmcache_vllm.vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.1-8B-Instruct --gpu-memory-utilization 0.7 --port 8000
+# Rope is not supported(No blend for Llama-3.1-8B-Instruction)
+# LMCACHE_CONFIG_FILE=example_blending.yaml python3 -m lmcache_vllm.vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.1-8B-Instruct --gpu-memory-utilization 0.7 --port 8000
+LMCACHE_CONFIG_FILE=example_blending.yaml python3 -m lmcache_vllm.vllm.entrypoints.openai.api_server --model mistralai/Mistral-7B-Instruct-v0.2 --gpu-memory-utilization 0.7 --port 8000
 ```
 
 Bench lmcache-vLLM
@@ -49,6 +53,7 @@ Bench lmcache-vLLM
 bash launch_lmcache.sh
 ```
 
+Note: For model selection, only those with  rope_scaling=None can blend KV cache. See [here](https://github.com/LMCache/LMCache/issues/242).
 
 
 ## Usage

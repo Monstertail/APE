@@ -19,6 +19,9 @@ question = "Question: What does this document mainly talks about? Answer: "
 llm = LLM(model="mistralai/Mistral-7B-Instruct-v0.2",
           gpu_memory_utilization=0.7,
           tensor_parallel_size=1)
+# llm = LLM(model="meta-llama/Llama-3.1-8B-Instruct",
+#           gpu_memory_utilization=0.7,
+#           tensor_parallel_size=1)
 sampling_params_generation = SamplingParams(temperature=0.0,
                                             top_p=0.95,
                                             max_tokens=30)
