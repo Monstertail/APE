@@ -31,17 +31,25 @@ Start a vLLM server:
 ```bash
 vllm serve meta-llama/Llama-3.1-8B-Instruct --disable-log-requests
 ```
-Bench lmcache-vLLM
-
-```bash
-bash launch_lmcache.sh
-```
 
 Bench vLLM
 
 ```bash
 bash launch_vllm.sh
 ```
+
+Start lm-cache-vLLM server:
+```bash
+LMCACHE_CONFIG_FILE=example_blending.yaml python3 -m lmcache_vllm.vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.1-8B-Instruct --gpu-memory-utilization 0.7 --port 8000
+```
+
+Bench lmcache-vLLM
+
+```bash
+bash launch_lmcache.sh
+```
+
+
 
 ## Usage
 

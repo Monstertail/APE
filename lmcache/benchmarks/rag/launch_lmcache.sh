@@ -4,16 +4,16 @@ MODEL_NAME="meta-llama/Llama-3.1-8B-Instruct"
 # DATASET_PATH=~/CacheBlend/inputs/musique_s.json
 DATASET_PATH=musique_s.json
 PROMPT_BUILD_METHOD=QA
-# KV_STORAGE_SIZE=30GB
-KV_STORAGE_SIZE=20GB
+KV_STORAGE_SIZE=30GB
+# KV_STORAGE_SIZE=20GB
 KV_CHUNK_SIZE=256
 QPS=3.5
 BASE_URL="http://localhost:8000/v1"
 DATASET_NAME=$(echo $DATASET_PATH | awk -F'/' '{print $NF}' | awk -F'.' '{print $1}')
 OUTPUT_FILE="$DATASET_NAME"_lmcache_qps_"$QPS".csv
 
-export LMCACHE_CONFIG_FILE="example_blending.yaml"
-
+export LMCACHE_CONFIG_FILE="example_blending.yaml"  # enables LMCache blending
+echo "LMCACHE_CONFIG_FILE is set to: $LMCACHE_CONFIG_FILE"
 log_str=$(python3 precompute.py --model "$MODEL_NAME"\
     --dataset "$DATASET_PATH" \
     --prompt-build-method $PROMPT_BUILD_METHOD \

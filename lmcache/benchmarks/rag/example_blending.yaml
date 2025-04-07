@@ -3,9 +3,15 @@ local_device: "cpu"
 
 # The maximum size of the local KV cache as an integer (GB)
 # Set to 5 by default
-max_local_cache_size: 20
+max_local_cache_size: 30
 
 # Enables KV blending
 enable_blending: True
+# enable_blending: Flase
+
 # pipelined_backend: False
 pipelined_backend: True
+
+# The recompute ratio if KV cache blending is enabled
+# Set to 0.5 by default
+blend_recompute_ratio: 0.5
