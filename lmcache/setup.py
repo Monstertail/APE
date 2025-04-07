@@ -26,7 +26,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=("csrc")),
     install_requires=[
-        "torch == 2.5.1", "numpy==1.26.4", "aiofiles", "pyyaml", "redis",
+        "torch == 2.4.0", "numpy==1.26.4", "aiofiles", "pyyaml", "redis",
         "nvtx", "safetensors", "transformers", "torchac_cuda >= 0.2.5",
         "sortedcontainers", "prometheus_client", "infinistore", "msgspec"
     ],

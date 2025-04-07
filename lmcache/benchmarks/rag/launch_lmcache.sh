@@ -2,7 +2,8 @@
 MODEL_NAME="mistralai/Mistral-7B-Instruct-v0.2"
 DATASET_PATH=~/CacheBlend/inputs/musique_s.json
 PROMPT_BUILD_METHOD=QA
-KV_STORAGE_SIZE=30GB
+# KV_STORAGE_SIZE=30GB
+KV_STORAGE_SIZE=20GB
 KV_CHUNK_SIZE=256
 QPS=3.5
 BASE_URL="http://localhost:8000/v1"

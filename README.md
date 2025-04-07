@@ -6,6 +6,24 @@
 
 We introduce APE for context-augmented generation with better efficiency and performance.
 
+## System Support
+
+### Environment Setup
+```bash
+conda create -yn ape-dev python=3.10
+conda activate ape-dev
+
+cd lmcache
+pip install -e .
+
+cd lmcache_vllm
+pip install -e .
+```
+
+### Backend Selection
+Set configure for the LMCache in .yaml. More parameters see [here](https://docs.lmcache.ai/configuration/v0/v0_config.html).
+See [details here](https://docs.lmcache.ai/examples/v0/backend.html) for more backends of storage.
+
 ## Usage
 
 ### Environment Setup
