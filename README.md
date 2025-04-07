@@ -6,7 +6,7 @@
 
 We introduce APE for context-augmented generation with better efficiency and performance.
 
-## System Support
+## System Support and Benchmark
 
 ### Environment Setup
 ```bash
@@ -23,6 +23,25 @@ pip install -e .
 ### Backend Selection
 Set configure for the LMCache in .yaml. More parameters see [here](https://docs.lmcache.ai/configuration/v0/v0_config.html).
 See [details here](https://docs.lmcache.ai/examples/v0/backend.html) for more backends of storage.
+
+### Bench RAG
+Follow the instruction [here](lmcache/benchmarks/rag/README.md). We adopt "meta-llama/Llama-3.1-8B-Instruct" here.
+
+Start a vLLM server:
+```bash
+vllm serve meta-llama/Llama-3.1-8B-Instruct --disable-log-requests
+```
+Bench lmcache-vLLM
+
+```bash
+bash launch_lmcache.sh
+```
+
+Bench vLLM
+
+```bash
+bash launch_vllm.sh
+```
 
 ## Usage
 
