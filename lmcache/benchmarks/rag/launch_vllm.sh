@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-MODEL_NAME="mistralai/Mistral-7B-Instruct-v0.2"
-DATASET_PATH=~/CacheBlend/inputs/musique_s.json
+# MODEL_NAME="mistralai/Mistral-7B-Instruct-v0.2"
+MODEL_NAME="meta-llama/Llama-3.1-8B-Instruct"
+# DATASET_PATH=~/CacheBlend/inputs/musique_s.json
+DATASET_PATH=musique_s.json
 PROMPT_BUILD_METHOD=QA
 QPS=3.5
-END_INDEX=32
+# END_INDEX=32
+END_INDEX=21
 BASE_URL="http://localhost:8000/v1"
 DATASET_NAME=$(echo $DATASET_PATH | awk -F'/' '{print $NF}' | awk -F'.' '{print $1}')
 OUTPUT_FILE="$DATASET_NAME"_vllm_qps_"$QPS".csv

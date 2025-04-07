@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-MODEL_NAME="mistralai/Mistral-7B-Instruct-v0.2"
-DATASET_PATH=~/CacheBlend/inputs/musique_s.json
+# MODEL_NAME="mistralai/Mistral-7B-Instruct-v0.2"
+MODEL_NAME="meta-llama/Llama-3.1-8B-Instruct"
+# DATASET_PATH=~/CacheBlend/inputs/musique_s.json
+DATASET_PATH=musique_s.json
 PROMPT_BUILD_METHOD=QA
 # KV_STORAGE_SIZE=30GB
 KV_STORAGE_SIZE=20GB
