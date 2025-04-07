@@ -7,4 +7,5 @@ max_local_cache_size: 20
 
 # Enables KV blending
 enable_blending: True
-pipelined_backend: False
+# pipelined_backend: False
+pipelined_backend: True
