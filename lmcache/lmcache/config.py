@@ -55,6 +55,11 @@ class LMCacheEngineConfig:
     blend_add_special_in_precomp: bool
     # whether to add special tokens in pre-computations
 
+    # APE configuration
+    enable_ape: bool  # whether to enable APE instead of blending
+    ape_temperature: float  # temperature parameter for APE
+    ape_scale: float  # scale parameter for APE
+
     @staticmethod
     def from_defaults(
             chunk_size: int = 256,
@@ -68,13 +73,20 @@ class LMCacheEngineConfig:
             blend_recompute_ratio: float = 0.15,
             blend_min_tokens: int = 256,
             blend_separator: str = blend_default_separator,
-            blend_add_special_in_precomp: bool = False
+            blend_add_special_in_precomp: bool = False,
+            enable_ape: bool = False,
+            ape_temperature: float = 0.9,
+            ape_scale: float = 0.9,
     ) -> "LMCacheEngineConfig":
         return LMCacheEngineConfig(
             chunk_size, local_device, max_local_cache_size, remote_url,
             remote_serde, pipelined_backend, save_decode_cache,
             enable_blending, blend_recompute_ratio, blend_min_tokens,
-            blend_separator, blend_add_special_in_precomp)
+            blend_separator, blend_add_special_in_precomp,
+            enable_ape,
+            ape_temperature,
+            ape_scale,
+        )
 
     @staticmethod
     def from_legacy(
@@ -114,6 +126,9 @@ class LMCacheEngineConfig:
             blend_min_tokens=256,
             blend_separator=blend_default_separator,
             blend_add_special_in_precomp=False,
+            enable_ape=False,
+            ape_temperature=0.9,
+            ape_scale=0.9,
         )
 
     @staticmethod
@@ -138,6 +153,10 @@ class LMCacheEngineConfig:
                                      blend_default_separator)
         blend_add_special_in_precomp = config.get(
             "blend_add_special_in_precomp", False)
+
+        enable_ape = config.get("enable_ape", False)
+        ape_temperature = config.get("ape_temperature", 0.9)
+        ape_scale = config.get("ape_scale", 0.9)
 
         match local_device:
             case "cpu" | "cuda" | None:
@@ -170,6 +189,9 @@ class LMCacheEngineConfig:
             blend_min_tokens,
             blend_separator,
             blend_add_special_in_precomp,
+            enable_ape,
+            ape_temperature,
+            ape_scale,
         )
 
     @staticmethod
@@ -226,6 +248,16 @@ class LMCacheEngineConfig:
         config.blend_add_special_in_precomp = bool(
             parse_env(get_env_name("blend_add_special_in_precomp"),
                       config.blend_add_special_in_precomp))
+
+        config.enable_ape = bool(
+            parse_env(get_env_name("enable_ape"),
+                      config.enable_ape))
+        config.ape_temperature = float(
+            parse_env(get_env_name("ape_temperature"),
+                      config.ape_temperature))
+        config.ape_scale = float(
+            parse_env(get_env_name("ape_scale"),
+                      config.ape_scale))
 
         return config
 
