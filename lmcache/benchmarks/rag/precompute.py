@@ -66,6 +66,7 @@ def precompute_all_kv(config: PrecomputeConfig) -> Tuple[int, int, str]:
     precompute_kv = OnlineKVPreCompute(config.api_key, config.base_url,
                                        tokenizer)
     with_bos = precompute_kv._blend_add_special_in_precomp
+    print(f"with_bos: {with_bos}")
     current_size_taken = 0
     size_upper_bound = config.kv_storage_size
     assert size_upper_bound > 0, f"size_upper_bound {size_upper_bound} <= 0"
