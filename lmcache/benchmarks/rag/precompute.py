@@ -5,7 +5,7 @@ from typing import Tuple
 from lmcache_vllm.blend_adapter import OnlineKVPreCompute
 from transformers import AutoConfig, AutoTokenizer
 from utils import (PromptBuildMethodType, build_fewshot_prompt,
-                   build_qa_prompt, load_dataset)
+                   build_qa_prompt,build_qa_prompt_with_prefix, load_dataset)
 
 
 @dataclass
@@ -85,7 +85,8 @@ def precompute_all_kv(config: PrecomputeConfig) -> Tuple[int, int, str]:
         doc_prompts = None
         this_case_size = 0
         if config.prompt_build_method == PromptBuildMethodType.QA:
-            doc_prompts, _ = build_qa_prompt(example, "")
+            # doc_prompts, _ = build_qa_prompt(example, "")
+            doc_prompts, _ = build_qa_prompt_with_prefix(example, "", prefix="<|begin_of_text|>\n<|start_header_id|>user<|end_header_id|>\n")
         elif config.prompt_build_method == PromptBuildMethodType.FEW_SHOT:
             doc_prompts, _ = build_fewshot_prompt(example)
         # NOTE: Do not need chat template here.

@@ -178,6 +178,17 @@ def build_qa_prompt(example, query_prompt):
     q_prompt = f"{query_prompt}{q}\nAnswer:"
     return doc_prompts, q_prompt
 
+def build_qa_prompt_with_prefix(example, query_prompt, prefix=""):
+    q = normalize_question(example["question"])
+    
+    # add prefix to each doc_prompt
+    doc_prompts = [
+        f"{prefix}{ctx['title']}\n\n{ctx['text']}\n\n" for ctx in example["ctxs"]
+    ]
+    
+    q_prompt = f"{query_prompt}{q}\nAnswer:"
+    return doc_prompts, q_prompt
+
 
 def build_fewshot_prompt(example):
     q = "\n\n" + example["question"]

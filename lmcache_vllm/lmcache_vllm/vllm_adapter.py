@@ -359,6 +359,7 @@ def lmcache_store_kv(
     cache_config: CacheConfig,
     kv_caches: List[torch.Tensor],
     store_status: List[StoreStatus],
+    ignore_prefix_len: int = 0, #add for ape
 ) -> None:
     """Store the KV caches into LMCache for the current model_input.
 
@@ -418,9 +419,11 @@ def lmcache_store_kv(
             current_tokens = torch.tensor(seq_data.get_token_ids()[:seq_len], device="cpu")
             vllm_block_size = cache_config.block_size
             skip_leading_tokens = engine.lookup(current_tokens)
+            if ignore_prefix_len > 0: # when APE is enabled, skip the prefix tokens
+                    skip_leading_tokens = ignore_prefix_len
             assert skip_leading_tokens <= seq_len
             if skip_leading_tokens < seq_len:
-                assert skip_leading_tokens % engine.chunk_size == 0
+                assert skip_leading_tokens % engine.chunk_size == 0 or skip_leading_tokens==ignore_prefix_len
                 slot_mapping = []
                 compute_slot_mapping(False, slot_mapping, seqid, seq_len, 
                     skip_leading_tokens, 0, vllm_block_size, seq_group_metadata.block_tables)
@@ -453,14 +456,18 @@ def lmcache_store_kv(
                     stored_token_num = len(slot_mapping)
                     skipped_token_num = seq_len - stored_token_num
                     kv_tensors_mask = torch.ones_like(current_tokens, dtype=torch.bool)
-                    kv_tensors_mask[:skipped_token_num] = False
+                    if ignore_prefix_len > 0: # when APE is enabled, skip the prefix tokens
+                        kv_tensors_mask= kv_tensors_mask[ignore_prefix_len:] # skip the prefix tokens
+                        current_tokens = current_tokens[ignore_prefix_len:]
+                    else:   
+                        kv_tensors_mask[:skipped_token_num] = False
                     engine.store(current_tokens.cpu(), tuple(kv_tuple_list), kv_tensors_mask,
                                 skip_existing = True, blocking = False)
             else:
                 stored_token_num = 0
                 skipped_token_num = seq_len
             logger.debug(f"Store skips {skipped_token_num} tokens "\
-                    f"and then stores {stored_token_num} tokens")
+                    f"and then stores {stored_token_num} tokens with APE prefix length of{ignore_prefix_len}")
             seq_data_idx += 1
 
 @_lmcache_nvtx_annotate

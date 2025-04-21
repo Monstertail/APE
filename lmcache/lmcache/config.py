@@ -59,7 +59,7 @@ class LMCacheEngineConfig:
     enable_ape: bool  # whether to enable APE instead of blending
     ape_temperature: float  # temperature parameter for APE
     ape_scale: float  # scale parameter for APE
-
+    ape_prefix:str  # prefix for APE
     @staticmethod
     def from_defaults(
             chunk_size: int = 256,
@@ -77,6 +77,7 @@ class LMCacheEngineConfig:
             enable_ape: bool = False,
             ape_temperature: float = 0.9,
             ape_scale: float = 0.9,
+            ape_prefix:str = "",
     ) -> "LMCacheEngineConfig":
         return LMCacheEngineConfig(
             chunk_size, local_device, max_local_cache_size, remote_url,
@@ -86,6 +87,7 @@ class LMCacheEngineConfig:
             enable_ape,
             ape_temperature,
             ape_scale,
+            ape_prefix,
         )
 
     @staticmethod
@@ -129,6 +131,7 @@ class LMCacheEngineConfig:
             enable_ape=False,
             ape_temperature=0.9,
             ape_scale=0.9,
+            ape_prefix="",
         )
 
     @staticmethod
@@ -157,7 +160,7 @@ class LMCacheEngineConfig:
         enable_ape = config.get("enable_ape", False)
         ape_temperature = config.get("ape_temperature", 0.9)
         ape_scale = config.get("ape_scale", 0.9)
-
+        ape_prefix = config.get("ape_prefix", "")
         match local_device:
             case "cpu" | "cuda" | None:
                 pass
@@ -192,6 +195,7 @@ class LMCacheEngineConfig:
             enable_ape,
             ape_temperature,
             ape_scale,
+            ape_prefix,
         )
 
     @staticmethod
@@ -258,6 +262,8 @@ class LMCacheEngineConfig:
         config.ape_scale = float(
             parse_env(get_env_name("ape_scale"),
                       config.ape_scale))
+        config.ape_prefix = parse_env(get_env_name("ape_prefix"),
+                                      config.ape_prefix)
 
         return config
 

@@ -131,9 +131,14 @@ def new_execute_model(
         # LMCache storing
         store_status = lmcache_should_store(model_input, kv_caches)
         if any([status != StoreStatus.NONE for status in store_status]):
+            if lmcache_get_config().enable_ape:
+                ignore_prefix_len = 0 # token length of the ape_prefix
+            else:
+                ignore_prefix_len = 0
             logger.info(f"KV cache saving mode: {store_status}")
             lmcache_store_kv(self.model_config, self.parallel_config, model_executable,
-                    model_input, self.cache_config, kv_caches, store_status)
+                    model_input, self.cache_config, kv_caches, store_status,
+                    ignore_prefix_len=ignore_prefix_len)
 
     # CacheBlend updates
     if lmcache_get_config().enable_blending and \
