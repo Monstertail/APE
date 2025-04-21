@@ -14,7 +14,12 @@ DATASET_NAME=$(echo $DATASET_PATH | awk -F'/' '{print $NF}' | awk -F'.' '{print 
 OUTPUT_FILE="$DATASET_NAME"_lmcache_qps_"$QPS".csv
 # Add output jsonl path
 OUTPUT_JSONL="$DATASET_NAME"_lmcache_qps_"$QPS".jsonl
+LOG_FILE="$DATASET_NAME"_lmcache_qps_"$QPS"_tmux.log
 
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "Starting LMCache benchmark at $(date)"
+echo "--------------------------------------"
 export LMCACHE_CONFIG_FILE="example_blending.yaml"  # enables LMCache blending
 echo "LMCACHE_CONFIG_FILE is set to: $LMCACHE_CONFIG_FILE"
 log_str=$(python3 precompute.py --model "$MODEL_NAME"\
@@ -35,3 +40,8 @@ python3 rag.py --qps $QPS\
   --prompt-build-method $PROMPT_BUILD_METHOD --base-url $BASE_URL \
   --max-tokens 32 --output "$OUTPUT_FILE" --verbose \
   --output-jsonl "$OUTPUT_JSONL"  # Add output-jsonl parameter
+
+
+echo "Benchmark completed at $(date)"
+echo "Results saved to $OUTPUT_FILE and $OUTPUT_JSONL"
+echo "Full logs saved to $LOG_FILE"
