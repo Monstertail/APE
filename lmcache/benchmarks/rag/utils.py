@@ -48,7 +48,7 @@ def init_logger(name: str, log_level=logging.DEBUG) -> Logger:
     ch.setLevel(log_level)
     ch.setFormatter(CustomFormatter())
     logger.addHandler(ch)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(log_level)
 
     return logger
 

@@ -4,6 +4,7 @@ import logging
 import random
 import time
 import json
+import os
 from dataclasses import dataclass
 
 import openai
@@ -12,7 +13,39 @@ from transformers import AutoTokenizer
 from utils import (AsyncLoopWrapper, PromptBuildMethodType, build_rag_prompt,
                    compute_f1, compute_rl, init_logger, load_dataset)
 
-logger = init_logger(__name__, logging.INFO)
+
+logger = None
+
+def setup_file_logging(logger, log_file):
+    """Set up file logging for the given logger."""
+    if not log_file:
+        return
+
+    # Create directory if it doesn't exist
+    log_dir = os.path.dirname(log_file)
+    if log_dir and not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    # Create file handler with the same format as the console handler
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(logging.DEBUG)  # Always capture detailed logs
+    
+    # Create a formatter
+    formatter = logging.Formatter(
+        '[%(asctime)s] %(levelname)s: %(message)s (%(filename)s:%(lineno)d:%(name)s)'
+    )
+    file_handler.setFormatter(formatter)
+    
+    # Add the handler to the logger
+    logger.addHandler(file_handler)
+
+    # # add the root logger
+    # root_logger = logging.getLogger()
+    # root_logger.addHandler(file_handler)
+    # root_logger.setLevel(logging.DEBUG)
+    
+    # Log that file logging has been set up
+    logger.info(f"Logging to file: {log_file}")
 
 system_prompt_set = {
     PromptBuildMethodType.QA:
@@ -148,6 +181,11 @@ def parse_arguments():
                        type=str,
                        default="",
                        help="Output file path for prompts and generated text in jsonl format")
+    
+    parser.add_argument("--log-file",
+                       type=str,
+                       default="",
+                       help="Output file for detailed logs")
     args = parser.parse_args()
     return args
 
@@ -367,6 +405,8 @@ class RAGManager:
 
 
 def run_rag(args):
+    global logger  
+    
     build_prompt_method_str = args.prompt_build_method.upper()
     build_prompt_method = None
     if build_prompt_method_str == "QA":
@@ -440,9 +480,37 @@ def main():
         args.tokenizer = args.model
     args.system_prompt = args.system_prompt.encode().decode('unicode_escape')
     args.query_prompt = args.query_prompt.encode().decode('unicode_escape')
-    if args.verbose:
-        global logger
-        logger = init_logger(__name__, log_level=logging.DEBUG)
+    
+    # init logger
+    global logger
+    log_level = logging.DEBUG if args.verbose else logging.INFO
+    logger = init_logger(__name__, log_level)
+    
+    
+    if args.log_file:
+        setup_file_logging(logger, args.log_file)
+        
+    
+    logger.info("=" * 80)
+    logger.info(f"RAG benchmark started with parameters:")
+    logger.info(f"  Model: {args.model}")
+    logger.info(f"  Dataset: {args.dataset}")
+    logger.info(f"  QPS: {args.qps}")
+    logger.info(f"  Prompt method: {build_prompt_method_str}")
+    logger.info(f"  Max tokens: {args.max_tokens}")
+    logger.info(f"  Output file: {args.output}")
+    logger.info(f"  Output JSONL: {args.output_jsonl}")
+    logger.info(f"  Log file: {args.log_file}")
+    logger.info(f"  Verbose mode: {args.verbose}")
+    logger.debug("Debug logging is enabled") 
+    logger.info("=" * 80)
+    
+  
+    # logger.debug("This is a debug message")
+    # logger.info("This is an info message")
+    # logger.warning("This is a warning message")
+    # logger.error("This is an error message")
+    
     run_rag(args)
 
 

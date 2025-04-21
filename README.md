@@ -44,7 +44,7 @@ Start lm-cache-vLLM server:
 ```bash
 # Rope is not supported(No blend for Llama-3.1-8B-Instruction)
 # LMCACHE_CONFIG_FILE=example_blending.yaml python3 -m lmcache_vllm.vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.1-8B-Instruct --gpu-memory-utilization 0.7 --port 8000
-LMCACHE_CONFIG_FILE=example_blending.yaml python3 -m lmcache_vllm.vllm.entrypoints.openai.api_server --model mistralai/Mistral-7B-Instruct-v0.2 --gpu-memory-utilization 0.7 --port 8000
+LMCACHE_CONFIG_FILE=example_blending.yaml python3 -m lmcache_vllm.vllm.entrypoints.openai.api_server --model mistralai/Mistral-7B-Instruct-v0.2 --gpu-memory-utilization 0.7 --port 8000 2>&1 | tee logs/lmcache_engine.log
 ```
 
 Bench lmcache-vLLM

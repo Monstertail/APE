@@ -14,7 +14,13 @@ DATASET_NAME=$(echo $DATASET_PATH | awk -F'/' '{print $NF}' | awk -F'.' '{print 
 OUTPUT_FILE="$DATASET_NAME"_lmcache_qps_"$QPS".csv
 # Add output jsonl path
 OUTPUT_JSONL="$DATASET_NAME"_lmcache_qps_"$QPS".jsonl
+
+
+mkdir -p logs
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 LOG_FILE="$DATASET_NAME"_lmcache_qps_"$QPS"_tmux.log
+RAG_LOG_FILE="logs/${DATASET_NAME}_rag_${TIMESTAMP}.log"
+PRECOMPUTE_LOG="logs/${DATASET_NAME}_precompute_${TIMESTAMP}.log"
 
 exec > >(tee -a "$LOG_FILE") 2>&1
 
@@ -22,26 +28,39 @@ echo "Starting LMCache benchmark at $(date)"
 echo "--------------------------------------"
 export LMCACHE_CONFIG_FILE="example_blending.yaml"  # enables LMCache blending
 echo "LMCACHE_CONFIG_FILE is set to: $LMCACHE_CONFIG_FILE"
-log_str=$(python3 precompute.py --model "$MODEL_NAME"\
+
+
+echo "Running precompute..."
+python3 precompute.py --model "$MODEL_NAME"\
     --dataset "$DATASET_PATH" \
     --prompt-build-method $PROMPT_BUILD_METHOD \
     --kv-storage-size $KV_STORAGE_SIZE --kv-chunk-size $KV_CHUNK_SIZE \
-    --base-url $BASE_URL)
-echo "$log_str"
-RETURNED_END_INDEX=$(echo "$log_str" | awk '{print $5}')
-# Assert non-empty.
-if [ -z "$RETURNED_END_INDEX" ]; then
-    echo "Precompute returns empty end index"
+    --base-url $BASE_URL 2>&1 | tee "$PRECOMPUTE_LOG"
+
+
+RETURNED_END_INDEX=$(grep "Precompute from .* to .* for model" "$PRECOMPUTE_LOG" | awk '{print $5}')
+
+if [ -z "$RETURNED_END_INDEX" ] || ! [[ "$RETURNED_END_INDEX" =~ ^[0-9]+$ ]]; then
+    echo "Error: Failed to extract valid end index: '$RETURNED_END_INDEX'"
+    echo "Check the precompute log for details: $PRECOMPUTE_LOG"
     exit 1
 fi
+
+echo "Precompute completed. End index: $RETURNED_END_INDEX"
+echo "Running RAG benchmark..."
+
 python3 rag.py --qps $QPS\
  --model "$MODEL_NAME" --dataset "$DATASET_PATH" \
  --end-index "$RETURNED_END_INDEX" --separator "[BLEND_SEP]"\
-  --prompt-build-method $PROMPT_BUILD_METHOD --base-url $BASE_URL \
-  --max-tokens 32 --output "$OUTPUT_FILE" --verbose \
-  --output-jsonl "$OUTPUT_JSONL"  # Add output-jsonl parameter
-
+ --prompt-build-method $PROMPT_BUILD_METHOD --base-url $BASE_URL \
+ --max-tokens 32 --output "$OUTPUT_FILE" --verbose \
+ --output-jsonl "$OUTPUT_JSONL" \
+ --log-file "$RAG_LOG_FILE"
 
 echo "Benchmark completed at $(date)"
-echo "Results saved to $OUTPUT_FILE and $OUTPUT_JSONL"
-echo "Full logs saved to $LOG_FILE"
+echo "Results saved to:"
+echo "  - CSV data: $OUTPUT_FILE" 
+echo "  - JSONL data: $OUTPUT_JSONL"
+echo "  - RAG logs: $RAG_LOG_FILE"
+echo "  - Precompute logs: $PRECOMPUTE_LOG"
+echo "  - Session log: $LOG_FILE"
