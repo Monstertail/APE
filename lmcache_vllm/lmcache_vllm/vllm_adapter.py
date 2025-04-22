@@ -467,7 +467,7 @@ def lmcache_store_kv(
                 stored_token_num = 0
                 skipped_token_num = seq_len
             logger.debug(f"Store skips {skipped_token_num} tokens "\
-                    f"and then stores {stored_token_num} tokens with APE prefix length of{ignore_prefix_len}")
+                    f"and then stores {stored_token_num} tokens with APE prefix length of {ignore_prefix_len}")
             seq_data_idx += 1
 
 @_lmcache_nvtx_annotate

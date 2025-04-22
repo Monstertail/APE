@@ -63,6 +63,8 @@ def precompute_all_kv(config: PrecomputeConfig) -> Tuple[int, int, str]:
     assert start_idx < len(
         eval_dataset
     ), f"start_idx {start_idx} >= length of dataset {len(eval_dataset)}"
+    ape_prefix = "You will be asked a question after reading several passages. Please directly answer the question based on the given passages. Do NOT repeat the question. The answer should be within 5 words..\nPassages:\n"
+    print(f"ape prefix length: {len(tokenizer(ape_prefix).input_ids)}")
     precompute_kv = OnlineKVPreCompute(config.api_key, config.base_url,
                                        tokenizer)
     with_bos = precompute_kv._blend_add_special_in_precomp
@@ -86,7 +88,9 @@ def precompute_all_kv(config: PrecomputeConfig) -> Tuple[int, int, str]:
         this_case_size = 0
         if config.prompt_build_method == PromptBuildMethodType.QA:
             # doc_prompts, _ = build_qa_prompt(example, "")
-            doc_prompts, _ = build_qa_prompt_with_prefix(example, "", prefix="<|begin_of_text|>\n<|start_header_id|>user<|end_header_id|>\n")
+            
+            doc_prompts, _ = build_qa_prompt_with_prefix(example, "", prefix=ape_prefix)
+            print(f"ape prefix: {tokenizer(ape_prefix)} is enabled.")
         elif config.prompt_build_method == PromptBuildMethodType.FEW_SHOT:
             doc_prompts, _ = build_fewshot_prompt(example)
         # NOTE: Do not need chat template here.

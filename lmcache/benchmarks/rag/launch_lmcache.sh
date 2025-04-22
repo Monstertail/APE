@@ -9,7 +9,7 @@ KV_STORAGE_SIZE=30GB
 KV_CHUNK_SIZE=256
 QPS=3.5
 # BASE_URL="http://localhost:8000/v1"
-BASE_URL="http://localhost:8001/v1"
+BASE_URL="http://localhost:8002/v1"
 DATASET_NAME=$(echo $DATASET_PATH | awk -F'/' '{print $NF}' | awk -F'.' '{print $1}')
 OUTPUT_FILE="$DATASET_NAME"_lmcache_qps_"$QPS".csv
 # Add output jsonl path
